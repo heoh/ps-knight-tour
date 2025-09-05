@@ -6,13 +6,19 @@ class Solution:
         self.board = board
 
     def solve(self):
-        BASELINE_MOVE_LIMIT = 3
-
-        for _ in range(BASELINE_MOVE_LIMIT):
-            if candidates := self.board.get_candidates():
-                self.board.move(candidates[0])
-
+        self.dfs()
         return self.board.moves[1:] if self.board.is_completed() else []
+
+    def dfs(self):
+        if self.board.is_completed():
+            return True
+        candidates = self.board.get_candidates()
+        for p in candidates:
+            self.board.move(p)
+            if self.dfs():
+                return True
+            self.board.undo()
+        return False
 
 
 ########################################
