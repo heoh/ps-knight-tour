@@ -1,0 +1,11 @@
+Button.cell {
+    border: none;
+    min-width: 0;
+}
+
+HorizontalGroup:odd .cell:odd:disabled, HorizontalGroup:even .cell:even:disabled {
+    background: rgba(240, 240, 240, 0.8);
+}
+HorizontalGroup:odd .cell:even:disabled, HorizontalGroup:even .cell:odd:disabled {
+    background: rgba(160, 160, 160, 0.8);
+}
