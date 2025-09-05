@@ -12,7 +12,7 @@ class Solution:
             if candidates := self.board.get_candidates():
                 self.board.move(candidates[0])
 
-        return self.board.moves[1:] if self.board.is_completed() else []
+        return self.board.moves if self.board.is_completed() else []
 
 
 ########################################
