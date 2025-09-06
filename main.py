@@ -4,9 +4,10 @@ from textual.containers import HorizontalGroup, VerticalGroup
 from textual.widgets import Button, Footer, Header
 from solution import Board, Solution
 
+APP_MAX_N = 20
+
 board: Board = None
 sequence_labels = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
-
 
 class KnightTourApp(App):
     CSS_PATH = 'main.tcss'
@@ -76,7 +77,11 @@ if __name__ == '__main__':
     S = tuple(map(int, input('X Y: ').split()))
     board = Board(N, S)
 
-    Solution(board).solve()
+    moves = Solution(board).solve()
 
-    app = KnightTourApp()
-    app.run()
+    if N <= APP_MAX_N:
+        app = KnightTourApp()
+        app.run()
+    else:
+        for move in (moves or [(-1, -1)]):
+            print(*move)
