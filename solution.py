@@ -1,18 +1,75 @@
+import sys; sys.setrecursionlimit(1000000)
+from abc import ABC, abstractmethod
+
 Position = tuple[int, int]
 X, Y = range(2)
 
-class Solution:
+
+class BaseSolution(ABC):
     def __init__(self, board: 'Board'):
         self.board = board
 
-    def solve(self):
-        BASELINE_MOVE_LIMIT = 3
+    @abstractmethod
+    def solve(self) -> list[Position]:
+        ...
 
-        for _ in range(BASELINE_MOVE_LIMIT):
-            if candidates := self.board.get_candidates():
-                self.board.move(candidates[0])
+
+class BacktrackingSolution(BaseSolution):
+    def __init__(self, board: 'Board', candidates_func, cost_limit: int=None):
+        super().__init__(board)
+        self.candidates_func = candidates_func
+        self.cost_limit = cost_limit or 1e12
+        self.cost = 0
+
+    def solve(self):
+        stack = [None]
+        while stack:
+            target = stack.pop()
+
+            if self.cost >= self.cost_limit:
+                break
+
+            if self.board.is_completed():
+                break
+
+            if target == -1:
+                self.board.undo()
+                continue
+            elif target:
+                self.board.move(target)
+                self.cost += 1
+
+            for p in reversed(self.candidates_func()):
+                stack.append(-1)
+                stack.append(p)
 
         return self.board.moves if self.board.is_completed() else []
+
+
+class GreedySolution(BaseSolution):
+    def __init__(self, board: 'Board', score_func, k: int=None, cost_limit: int=None):
+        super().__init__(board)
+        self.score_func = score_func
+        self.k = k
+        self.cost_limit = cost_limit
+
+    def get_candidates(self):
+        candidates = self.board.get_candidates()
+        candidates.sort(key=self.score_func, reverse=True)
+        return candidates[:self.k] if self.k else candidates
+
+    def solve(self):
+        return BacktrackingSolution(self.board, self.get_candidates, self.cost_limit).solve()
+
+
+class Solution(BaseSolution):
+    def solve(self):
+        def get_score(p: Position):
+            N = self.board.N
+            px, py = p
+            return abs((px - 0.5 - N/2) / N) + abs((py - 0.5 - N/2) / N)
+
+        return GreedySolution(self.board, get_score, k=3, cost_limit=1000000).solve()
 
 
 ########################################
