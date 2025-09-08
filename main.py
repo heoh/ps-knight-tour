@@ -4,7 +4,7 @@ from textual.containers import HorizontalGroup, VerticalGroup
 from textual.widgets import Button, Footer, Header
 from solution import Board, Solution
 
-APP_MAX_N = 20
+APP_MAX_N = 80
 
 board: Board = None
 sequence_labels = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
@@ -20,7 +20,7 @@ class KnightTourApp(App):
     ]
 
     def on_mount(self) -> None:
-        self.render_board()
+        self.render_board(init=True)
 
     def compose(self) -> ComposeResult:
         # yield Header()
@@ -53,9 +53,13 @@ class KnightTourApp(App):
         board.reset()
         self.render_board()
 
-    def render_board(self):
-        for y in range(1, board.N+1):
-            for x in range(1, board.N+1):
+    def render_board(self, init=False):
+        N = board.N
+        kx, ky = board.knight
+        y_range = range(1, N+1) if init else range(max(1, ky-5), min(N+1, ky+5))
+        x_range = range(1, N+1) if init else range(max(1, kx-5), min(N+1, kx+5))
+        for y in y_range:
+            for x in x_range:
                 p = (x, y)
                 button: Button = self.query_one(f'#cell_{x}_{y}')
                 if p == board.knight:
